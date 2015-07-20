@@ -216,12 +216,11 @@ def status_prefix_parse(string, prefix):
         prefix = prefix_parse(prefix).prefix_to_mode
 
     modes = set()
-    for char in str(string):
-        if string[0] in prefix:
-            prefix_char, string = string[0], string[1:]
-            modes.add(prefix[prefix_char])
-        else:
-            return (modes, string)
+
+    while string[0] in prefix:
+        prefix_char, string = string[0], string[1:]
+        modes.add(prefix[prefix_char])
+    return (modes, string)
 
 
 @lru_cache(maxsize=32)
