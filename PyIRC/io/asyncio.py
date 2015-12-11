@@ -21,6 +21,7 @@ except ImportError as e:
 from collections import namedtuple
 from functools import update_wrapper, partial
 from logging import getLogger
+import traceback
 
 from PyIRC.base import IRCBase, Event
 from PyIRC.line import Line
@@ -127,8 +128,12 @@ class IRCProtocol(IRCBase, asyncio.Protocol):
     def _process_queue(self):
         while True:
             co, future = yield from self._call_queue.get()
-            ret = yield from co
-            future.set_result(ret)
+            try:
+                ret = yield from co
+            except Exception as err:
+                traceback.print_tb(err.__traceback__)
+            else:
+                future.set_result(ret)
 
     def _process_queue_exit(self, future):
         _logger.critical("Process queue died!")
