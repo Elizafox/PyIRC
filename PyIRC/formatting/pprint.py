@@ -190,12 +190,17 @@ class PrettyPrintedIRCMixin(IRCBase):
     def maybe_show_names(self, _, line):
         """Show the nicks on a channel, if ChannelTrack is loaded."""
         channel = line.params[1]
-        if 'ChannelTrack' in self.extensions:
-            chan = self.extensions['ChannelTrack'].get_channel(channel)
-            users = [n for n in chan.users.keys()]
-            users.sort()
-            userstr = ', '.join(self.nick_colour(str(nick)) for nick in users)
-            self._printf("*** Chatting on {}: [{}]".format(channel, userstr))
+
+        if 'ChannelTrack' not in self.extensions:
+            return
+        if channel not in self.extensions['ChannelTrack'].channels:
+            return
+
+        chan = self.extensions['ChannelTrack'].get_channel(channel)
+        users = [n for n in chan.users.keys()]
+        users.sort()
+        userstr = ', '.join(self.nick_colour(str(nick)) for nick in users)
+        self._printf("*** Chatting on {}: [{}]".format(channel, userstr))
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
